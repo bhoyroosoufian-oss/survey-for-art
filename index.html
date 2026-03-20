@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Your Art Preference Survey</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 8px;
+            background-color: #f4f6f9;
+        }
+
+        h1 {
+            font-size: 18px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        p {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .section {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .question {
+            margin-bottom: 12px;
+        }
+
+        /* Two-row scale layout */
+        .scale {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 per row */
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .scale label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 6px 0;
+            background: #f0f0f0;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .scale input {
+            margin-right: 3px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #results {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            font-size: 13px;
+        }
+
+        /* 📱 Mobile adjustments */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 16px;
+            }
+
+            h2 {
+                font-size: 14px;
+            }
+
+            p {
+                font-size: 12px;
+            }
+
+            .scale label {
+                font-size: 11px;
+                padding: 5px 0;
+            }
+
+            button {
+                font-size: 13px;
+                padding: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Discover Your Art Preference Survey</h1>
+<p style="text-align:center;">
+Rate each situation from 1 (Not at all) to 10 (I would absolutely love it).
+</p>
+
+<form id="surveyForm"></form>
+
+<button type="button" onclick="calculateResults()">Calculate Results</button>
+
+<div id="results"></div>
+
+<script>
+const sections = {
+    "Paintings": [1,2,3],
+    "Sculpture": [4,5,6],
+    "Architecture": [7,8,9],
+    "Literature": [10,11,12],
+    "Music": [13,14,15],
+    "Theatre": [16,17,18],
+    "Cinema": [19,20,21]
+};
+
+const questions = [
+    "You spend time in a gallery looking at different styles of paintings.",
+    "You decorate your room with aesthetic/artistic paintings or drawings.",
+    "You try painting or drawing in your free time.",
+    "You walk through a park filled with large artistic sculptures.",
+    "You visit a museum with ancient or modern statues.",
+    "You try creating something using clay or 3D materials.",
+    "You admire a beautifully designed building from the outside.",
+    "You enjoy exploring unique buildings or historical monuments.",
+    "You are interested in how spaces are designed inside (lighting, layout, structure).",
+    "You read a novel purely for enjoyment.",
+    "You write poems, short stories, or personal reflections.",
+    "You enjoy listening to someone read or perform a story aloud.",
+    "You listen to music while studying, relaxing, or traveling.",
+    "You attend a live music performance or concert.",
+    "You sing or play an instrument for fun.",
+    "You attend a live stage performance or drama show.",
+    "You participate in acting or role-playing activities.",
+    "You enjoy watching performances that happen live rather than on screen.",
+    "You enjoy watching films that tell powerful stories.",
+    "You pay attention to cinematography, visuals, and special effects in movies.",
+    "You would rewatch a movie just to experience it again."
+];
+
+let form = document.getElementById("surveyForm");
+let qIndex = 0;
+
+for (let section in sections) {
+    let sectionDiv = document.createElement("div");
+    sectionDiv.className = "section";
+    sectionDiv.innerHTML = `<h2>${section}</h2>`;
+
+    sections[section].forEach(num => {
+        let questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+
+        let html = `<p>${num}. ${questions[qIndex]}</p><div class="scale">`;
+
+        for (let i = 1; i <= 10; i++) {
+            html += `
+                <label>
+                    <input type="radio" name="q${num}" value="${i}" required> ${i}
+                </label>`;
+        }
+
+        html += "</div>";
+        questionDiv.innerHTML = html;
+        sectionDiv.appendChild(questionDiv);
+        qIndex++;
+    });
+
+    form.appendChild(sectionDiv);
+}
+
+function interpret(score) {
+    if (score <= 3) return "Strong Dislike";
+    if (score <= 6) return "Neutral";
+    if (score <= 8) return "Enjoys It";
+    return "Loves It";
+}
+
+function calculateResults() {
+    if (!document.getElementById("surveyForm").checkValidity()) {
+        alert("Please answer all questions before calculating results.");
+        return;
+    }
+
+    let resultsHTML = "<h2>Your Results</h2>";
+
+    for (let section in sections) {
+        let total = 0;
+
+        sections[section].forEach(num => {
+            let value = document.querySelector(`input[name="q${num}"]:checked`).value;
+            total += parseInt(value);
+        });
+
+        let average = (total / 3).toFixed(2);
+        let interpretation = interpret(average);
+
+        resultsHTML += `<p><strong>${section}:</strong> ${average} &rarr; ${interpretation}</p>`;
+    }
+
+    document.getElementById("results").innerHTML = resultsHTML;
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
